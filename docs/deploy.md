@@ -175,7 +175,56 @@ sudo systemctl reload php8.4-fpm nginx
 
 ---
 
-## 6. Ishga tushirishdan oldin
+## 6. Hozirgi server (vaqtinchalik)
+
+| Nima | Manzil |
+|------|--------|
+| Server | `164.92.231.103` (Ubuntu 24.04, PHP 8.4-fpm, PostgreSQL 16) |
+| Papkalar | `/var/www/textile/{api,front/dist,admin/dist}` |
+| Sinov saytlari (DNS siz) | `http://textile.164.92.231.103.nip.io`, `http://admin-textile...nip.io`, `http://api-textile...nip.io` |
+| Nginx | `/etc/nginx/sites-available/textile.conf` |
+| Baza | `textile` / foydalanuvchi `textile` |
+
+### motex domenlariga o'tkazish
+
+1. DNS da `motex.uz`, `www.motex.uz`, `admin.motex.uz`, `api.motex.uz` uchun A-yozuvni `164.92.231.103` ga o'zgartiring.
+2. Serverda:
+   ```bash
+   cd /var/www/textile/api
+   sed -i 's|^APP_URL=.*|APP_URL=https://api.motex.uz|' .env && php8.4 artisan config:cache
+   certbot --nginx -d motex.uz -d www.motex.uz -d admin.motex.uz -d api.motex.uz
+   ```
+3. Lokalda frontendlarni qayta build qilib yuklang:
+   ```bash
+   cd web-3d && echo 'VITE_API_ROOT=https://api.motex.uz/api/v1' > .env.production && npx vite build
+   rsync -az --delete dist/ root@164.92.231.103:/var/www/textile/front/dist/
+
+   cd ../admin && echo 'VITE_API_ROOT=https://api.motex.uz/api/v1/admin' > .env.production && npm run build
+   rsync -az --delete dist/ root@164.92.231.103:/var/www/textile/admin/dist/
+   ```
+
+> `APP_URL` muhim: yuklangan fayl va 3D model havolalari shundan yasaladi.
+> Noto'g'ri bo'lsa konstruktor modelni yuklay olmaydi.
+
+### Frontendni serverda build qilmaymiz
+
+Bu serverda 1.9 GB RAM va swap yo'q, Node ham o'rnatilmagan.
+Shuning uchun `dist` lokalda yig'iladi va `rsync` bilan yuklanadi.
+
+### Passport kalitlari huquqi
+
+`php artisan passport:keys` dan keyin:
+
+```bash
+chmod 600 storage/oauth-private.key && chmod 660 storage/oauth-public.key
+chown www-data:www-data storage/oauth-*.key
+```
+
+Aks holda kirish `Server Error` beradi (kalit fayli huquqi noto'g'ri).
+
+---
+
+## 7. Ishga tushirishdan oldin
 
 1. `APP_DEBUG=false` ekanini tekshiring.
 2. Super-admin parolini almashtiring (seed paroli `admin123`).
