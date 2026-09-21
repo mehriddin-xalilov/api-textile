@@ -1,0 +1,46 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH kalitini tayyorlash
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Serverga chiqarish
+        env:
+          HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh "$SSH_USER@$HOST" bash -s <<'EOSSH'
+            set -euo pipefail
+            cd /var/www/textile/api
+            git pull --ff-only
+            COMPOSER_ALLOW_SUPERUSER=1 php8.4 /usr/local/bin/composer install --no-dev -o --no-interaction
+            php8.4 artisan migrate --force
+            php8.4 artisan config:cache
+            php8.4 artisan route:cache
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod 600 storage/oauth-private.key || true
+            chmod 660 storage/oauth-public.key || true
+            systemctl reload php8.4-fpm
+          EOSSH
+
+      - name: Tekshirish
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${{ secrets.API_HEALTH_URL }}")
+          echo "API javobi: $code"
+          test "$code" = "200"

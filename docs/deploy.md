@@ -224,7 +224,13 @@ Aks holda kirish `Server Error` beradi (kalit fayli huquqi noto'g'ri).
 
 ---
 
-## 7. Ishga tushirishdan oldin
+## 7. CI/CD
+
+Avtomatik deploy: [ci-cd.md](ci-cd.md). `main` ga push qilinsa uchala qism ham o'zi yangilanadi.
+
+---
+
+## 8. Ishga tushirishdan oldin
 
 1. `APP_DEBUG=false` ekanini tekshiring.
 2. Super-admin parolini almashtiring (seed paroli `admin123`).
