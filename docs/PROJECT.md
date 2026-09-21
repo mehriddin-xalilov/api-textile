@@ -141,6 +141,7 @@ Admin `useGet({params: {include, filter, sort, limit, page}})` → `limit` avtom
 - [x] Sahifa almashganda tepaga qaytadi (`web-3d/src/shop/ScrollToTop.tsx`), "orqaga" bosilganda avvalgi joy saqlanadi; yuklanish paytida skelet ko'rsatiladi (sahifa sakramaydi)
 - [x] Ko'p rasmli mahsulot: kartochkada ikkinchi rasm hover'da + rasm soni belgisi, sahifada kichik rasmlar ustuni va to'liq ekran (lightbox) ko'rinish
 - [x] Rang tanlash brauzerning eski OS oynasi o'rniga o'z komponentimiz (`web-3d/src/components/editor/ColorField.tsx`): hex maydon + tayyor ranglar
+- [x] Kirish oynasi Uzum uslubida: avval telefon (`POST /auth/check` raqam bazada bormi), keyin parol yoki ro'yxatdan o'tish; raqam maskasi, parolni ko'rsatish, orqaga qaytish
 - [x] Til almashish sahifani qayta yuklamaydi (`window.location.reload()` olib tashlandi): `setLang` faqat holatni yangilaydi va kontentni yangi tilda qayta oladi, `<Routes key={lang}>` sahifani qayta chizadi
 - [x] Banner sliderida ikki yon tomonda o'q tugmalari + nuqtalar
 - [x] Til tanlash: bayroq + kod tugmasi, ochiladigan ro'yxat (SVG bayroqlar, belgilangan til ✓) — `web-3d/src/shop/LangSwitcher.tsx`
