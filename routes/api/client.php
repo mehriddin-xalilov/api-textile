@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->controller(Client\AuthController::class)->group(function () {
     Route::post('register', 'register')->middleware('throttle:20,1');
     Route::post('login', 'login')->middleware('throttle:30,1');
+    Route::post('check', 'check')->middleware('throttle:30,1');
     Route::post('refresh', 'refresh')->middleware('throttle:30,1');
     Route::middleware('auth:api')->group(function () {
         Route::get('me', 'me');

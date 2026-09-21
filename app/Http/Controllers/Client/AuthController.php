@@ -49,6 +49,21 @@ class AuthController extends Controller
         return ApiResponse::item(new UserResource($request->user()->load('avatar')));
     }
 
+    /**
+     * Telefon raqam bazada bormi — kirish oynasi bir bosqichli bo'lishi uchun.
+     * Parol so'ralmaydi, shuning uchun throttle bilan cheklangan.
+     */
+    public function check(Request $request): JsonResponse
+    {
+        $data = $request->validate(['phone_number' => ['required', 'string', 'max:20']]);
+        $phone = Phone::normalize($data['phone_number']);
+
+        return ApiResponse::item([
+            'exists' => User::query()->where('phone_number', $phone)->exists(),
+            'phone_number' => $phone,
+        ]);
+    }
+
     /** Profil ma'lumotlarini yangilash (ism, familiya, email). */
     public function updateProfile(Request $request): JsonResponse
     {
