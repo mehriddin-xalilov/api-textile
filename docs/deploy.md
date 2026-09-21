@@ -224,13 +224,28 @@ Aks holda kirish `Server Error` beradi (kalit fayli huquqi noto'g'ri).
 
 ---
 
-## 7. CI/CD
+## 7. 3D katalog rasmlari (thumbnail)
+
+Katalog kartochkalaridagi rasmlar 3D modeldan brauzerda yasaladi.
+`GarmentModel` qayta yaratilsa (masalan `migrate:fresh` dan keyin) ular yo'qoladi
+va kartochkalarda "rasm yo'q" chiqadi. Tiklash:
+
+1. Admin sifatida kiring (sayt domenida), so'ng `/tools/thumbs?auto=1` ni oching.
+2. Generator har mahsulot uchun 3D dan surat olib serverga yuklaydi va
+   `garment_models.thumbnail_id` ni yangilaydi.
+3. `?auto=1&only=photos` — faqat tayyor mahsulot fotolarini qayta yasaydi.
+
+Sahifa brauzerda ochiq turishi kerak, chunki render WebGL orqali bajariladi.
+
+---
+
+## 8. CI/CD
 
 Avtomatik deploy: [ci-cd.md](ci-cd.md). `main` ga push qilinsa uchala qism ham o'zi yangilanadi.
 
 ---
 
-## 8. Ishga tushirishdan oldin
+## 9. Ishga tushirishdan oldin
 
 1. `APP_DEBUG=false` ekanini tekshiring.
 2. Super-admin parolini almashtiring (seed paroli `admin123`).
