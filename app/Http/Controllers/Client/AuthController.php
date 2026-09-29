@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LoginRequest;
 use App\Http\Requests\Client\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\B2bLead;
 use App\Models\User;
 use App\Services\Auth\PassportTokenService;
 use App\Support\ApiResponse;
@@ -22,6 +23,11 @@ class AuthController extends Controller
     {
         $user = User::query()->create($request->validated());
         $user->assignRole('customer');
+
+        // B2B xatidan kelgan bo'lsa — lidga bog'laymiz
+        if ($token = $request->input('lead_token')) {
+            B2bLead::query()->where('token', $token)->whereNull('user_id')->update(['user_id' => $user->id]);
+        }
 
         $tokens = $this->tokens->issueByPassword($user->phone_number, $request->password);
 

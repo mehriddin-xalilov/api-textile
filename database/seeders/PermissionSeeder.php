@@ -33,6 +33,7 @@ class PermissionSeeder extends Seeder
         'orders' => ['list', 'view', 'update'],
         'ready-products' => ['list', 'view', 'create', 'update', 'delete'],
         'reviews' => ['list', 'update', 'delete'],
+        'b2b-leads' => ['list', 'update'],
     ];
 
     private const LABELS = [

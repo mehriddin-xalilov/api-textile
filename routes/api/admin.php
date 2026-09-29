@@ -126,6 +126,13 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('{ready_product}', 'destroy')->middleware('permission:ready-products.delete');
     });
 
+    // ── B2B lidlar ──────────────────────────────────────────────────────────
+    Route::controller(Admin\B2bLeadController::class)->prefix('b2b-leads')->group(function () {
+        Route::get('/', 'index')->middleware('permission:b2b-leads.list');
+        Route::get('stats', 'stats')->middleware('permission:b2b-leads.list');
+        Route::put('{lead}', 'update')->middleware('permission:b2b-leads.update');
+    });
+
     // ── Izohlar (moderatsiya) ──────────────────────────────────────────────
     Route::controller(Admin\ReviewController::class)->prefix('reviews')->group(function () {
         Route::get('/', 'index')->middleware('permission:reviews.list');

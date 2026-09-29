@@ -37,6 +37,10 @@ Route::get('pages/{page:slug}', [Client\SiteController::class, 'page'])->name('p
 Route::get('templates', [Client\CatalogController::class, 'templates']);
 Route::get('templates/{design}', [Client\CatalogController::class, 'template'])->name('templates.show');
 
+// B2B kampaniya: xat ochilishi (piksel) va havola bosilishi
+Route::get('track/open/{token}.gif', [Client\TrackController::class, 'open'])->where('token', '[A-Za-z0-9]{4,20}');
+Route::post('track/click', [Client\TrackController::class, 'click'])->middleware('throttle:60,1');
+
 Route::get('ready-products', [Client\ReadyProductController::class, 'index']);
 Route::get('ready-products/{slug}', [Client\ReadyProductController::class, 'show']);
 
