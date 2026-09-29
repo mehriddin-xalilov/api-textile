@@ -55,7 +55,7 @@ class CatalogController extends Controller
                 AllowedFilter::callback('price_to', fn ($q, $v) => $q->where('base_price', '<=', $v)),
             )
             ->allowedSorts('base_price', 'created_at', 'sort')
-            ->defaultSort('sort', '-id')
+            ->defaultSort('sort', 'id')
             ->paginate($this->perPage($request));
 
         return ApiResponse::paginated($products, ProductResource::class);
