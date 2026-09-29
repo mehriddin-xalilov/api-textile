@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('files', [Admin\FileController::class, 'store']);
 
     Route::get('dashboard', Admin\DashboardController::class)->middleware('permission:dashboard.view');
+    Route::get('notifications', Admin\NotificationController::class);
     Route::get('settings', [Admin\SettingController::class, 'index'])->middleware('permission:settings.list');
     Route::put('settings', [Admin\SettingController::class, 'update'])->middleware('permission:settings.update');
 
