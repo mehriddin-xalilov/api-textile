@@ -159,19 +159,37 @@ final class DesignCanvas
         return $out;
     }
 
-    /** @return list<array{side:string, area:string, type:string, label:string, size_cm:string|null}> */
+    /**
+     * 3D konstruktor (v2) bosma taxtasi: 800×1000 px ≙ 12"×16" (30.5 × 40.6 sm) — Canvas2DStage bilan bir xil.
+     * Qatlam o'lchami konstruktordagi getLayerBoxSize formulasi bilan hisoblanadi (rasm 350px·scale, shakl 250px·scale).
+     */
+    public const V2_BOARD_PX = [800, 1000];
+
+    public const V2_BOARD_CM = [30.5, 40.6];
+
+    /** @return list<array{side:string, area:string, type:string, label:string, size_cm:string|null, pos_cm:string|null}> */
     private static function summaryV2(array $canvas): array
     {
         $sides = ['front' => 'front', 'back' => 'back', 'sleeve_left' => 'left_sleeve', 'sleeve_right' => 'right_sleeve'];
+        $cmPerPx = self::V2_BOARD_CM[0] / self::V2_BOARD_PX[0];
         $out = [];
 
         foreach ($canvas['layers'] ?? [] as $layer) {
             if (($layer['visible'] ?? true) === false) {
                 continue;
             }
+            $scale = (float) ($layer['scale'] ?? 1);
+            [$wPx, $hPx] = match ($layer['type']) {
+                'image' => [350 * $scale, 350 * $scale / max(0.05, (float) ($layer['aspectRatio'] ?? 1))],
+                'text' => self::textBoxPx($layer),
+                default => [250 * $scale, 250 * $scale],
+            };
+            $x = (float) ($layer['x'] ?? 0.5) * self::V2_BOARD_CM[0];
+            $y = (float) ($layer['y'] ?? 0.5) * self::V2_BOARD_CM[1];
+
             $out[] = [
                 'side' => $sides[$layer['zone']] ?? $layer['zone'],
-                'area' => '3D zona',
+                'area' => sprintf('%s × %s sm', self::V2_BOARD_CM[0], self::V2_BOARD_CM[1]),
                 'type' => $layer['type'] === 'text' ? 'text' : ($layer['type'] === 'image' ? 'image' : 'clipart'),
                 'label' => match ($layer['type']) {
                     'text' => sprintf('"%s" — %s %s%s', str_replace("\n", ' / ', $layer['text']), $layer['fontFamily'], $layer['fontWeight'] ?? '400', ($layer['fontStyle'] ?? 'normal') === 'italic' ? ' italic' : ''),
@@ -179,10 +197,31 @@ final class DesignCanvas
                     'badge' => 'Tayyor logo #'.($layer['clipartId'] ?? '?').' ('.($layer['fillColor'] ?? '').')',
                     default => isset($layer['clipartId']) ? 'Tayyor logo #'.$layer['clipartId'] : 'Logo'.(isset($layer['fileId']) ? ' #'.$layer['fileId'] : ''),
                 },
-                'size_cm' => null,
+                'size_cm' => sprintf('%.1f × %.1f sm', $wPx * $cmPerPx, $hPx * $cmPerPx),
+                // markaz: chapdan / yuqoridan; burilish bo'lsa gradus
+                'pos_cm' => sprintf('%.1f / %.1f sm', $x, $y).(abs((float) ($layer['rotation'] ?? 0)) >= 1 ? sprintf(' · %d°', round((float) $layer['rotation'])) : ''),
             ];
         }
 
         return $out;
+    }
+
+    /**
+     * Matn qutisi (px, 800 taxta): serverda shrift o'lchab bo'lmaydi — o'rtacha harf eni 0.58·fontSize.
+     *
+     * @return array{0: float, 1: float}
+     */
+    private static function textBoxPx(array $layer): array
+    {
+        $scale = (float) ($layer['scale'] ?? 1);
+        $fs = (float) ($layer['fontSize'] ?? 48);
+        $lines = explode("\n", (string) ($layer['text'] ?? ''));
+        $w = 0.0;
+        foreach ($lines as $line) {
+            $w = max($w, mb_strlen($line) * $fs * 0.58 + max(0, mb_strlen($line) - 1) * (float) ($layer['letterSpacing'] ?? 0));
+        }
+        $h = count($lines) * $fs * (float) ($layer['lineHeight'] ?? 1.2);
+
+        return [max(48, $w * $scale), max(32, $h * $scale)];
     }
 }
