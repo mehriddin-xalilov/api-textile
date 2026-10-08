@@ -61,7 +61,7 @@ class NotificationController extends Controller
             $items[] = [
                 'id' => 'user-'.$u->id,
                 'type' => 'user',
-                'title' => 'Yangi mijoz',
+                'title' => $u->studio_approved_at ? 'Yangi mijoz' : 'Konstruktor ruxsatini kutmoqda',
                 'description' => sprintf('%s · %s', $u->full_name, $u->phone_number),
                 'time' => $u->created_at,
                 'link' => '/users/view/'.$u->id,

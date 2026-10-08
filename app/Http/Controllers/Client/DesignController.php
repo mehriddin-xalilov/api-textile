@@ -34,6 +34,7 @@ class DesignController extends Controller
 
     public function store(StoreDesignRequest $request): JsonResponse
     {
+        abort_if($request->user()->studio_approved_at === null, 403, 'Konstruktor sizga hali ochilmagan: administrator tasdiqlashi kerak.');
         // canvas: validated() faqat qoidali kalitlarni qoldiradi — konstruktorning to'liq JSON'ini saqlaymiz (tekshiruvdan o'tgan).
         $design = $request->user()->designs()->create(['canvas' => $request->input('canvas')] + $request->validated() + ['status' => DesignStatus::Draft]);
 
@@ -42,6 +43,7 @@ class DesignController extends Controller
 
     public function update(StoreDesignRequest $request, Design $design): JsonResponse
     {
+        abort_if($request->user()->studio_approved_at === null, 403, 'Konstruktor sizga hali ochilmagan: administrator tasdiqlashi kerak.');
         $this->authorizeOwner($request, $design);
         $design->update(['canvas' => $request->input('canvas')] + $request->validated());
 

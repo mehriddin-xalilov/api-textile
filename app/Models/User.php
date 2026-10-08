@@ -22,10 +22,13 @@ class User extends Authenticatable implements OAuthenticatable
 
     protected $fillable = [
         'first_name', 'last_name', 'phone_number', 'email', 'password',
-        'status', 'locale', 'avatar_id', 'last_login_at', 'phone_verified_at',
+        'status', 'locale', 'avatar_id', 'last_login_at', 'phone_verified_at', 'studio_approved_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
+
+    /** Yangi mijoz konstruktorga kirish uchun admin tasdig'ini kutadi. */
+    protected $attributes = ['studio_approved_at' => null];
 
     protected function casts(): array
     {
@@ -34,6 +37,7 @@ class User extends Authenticatable implements OAuthenticatable
             'status' => Status::class,
             'email_verified_at' => 'datetime',
             'phone_verified_at' => 'datetime',
+            'studio_approved_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
     }

@@ -26,6 +26,7 @@ class UserController extends Controller
                     ->orWhere('last_name', 'ilike', "%{$v}%")
                     ->orWhere('phone_number', 'like', "%{$v}%"))),
                 AllowedFilter::exact('status'),
+                AllowedFilter::callback('studio', fn ($q, $v) => $v === 'pending' ? $q->whereNull('studio_approved_at') : $q->whereNotNull('studio_approved_at')),
                 AllowedFilter::callback('role', fn ($q, $v) => $q->whereHas('roles', fn ($r) => $r->where('name', $v))))
             ->allowedSorts('id', 'first_name', 'created_at', 'last_login_at')
             ->defaultSort('-id')
@@ -43,7 +44,7 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         $user = DB::transaction(function () use ($request) {
-            $user = User::query()->create($request->safe()->except('role_ids'));
+            $user = User::query()->create($request->safe()->except('role_ids') + ['studio_approved_at' => now()]);
             $user->syncRoles($request->input('role_ids', []));
 
             return $user;
@@ -67,6 +68,15 @@ class UserController extends Controller
         });
 
         return ApiResponse::item(new UserResource($user->load('roles')));
+    }
+
+    /** Konstruktorga kirishni tasdiqlash / bekor qilish. */
+    public function studioAccess(Request $request, User $user): JsonResponse
+    {
+        $data = $request->validate(['approved' => ['required', 'boolean']]);
+        $user->forceFill(['studio_approved_at' => $data['approved'] ? now() : null])->save();
+
+        return ApiResponse::item(new UserResource($user));
     }
 
     public function destroy(Request $request, User $user): JsonResponse

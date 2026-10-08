@@ -13,6 +13,7 @@ class UserFactory extends Factory
         return [
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
+            'studio_approved_at' => now(),
             'phone_number' => '+9989'.fake()->unique()->numerify('########'),
             'password' => 'password',
         ];

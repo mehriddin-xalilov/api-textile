@@ -30,6 +30,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/', 'store')->middleware('permission:users.create');
         Route::get('{user}', 'show')->middleware('permission:users.view');
         Route::put('{user}', 'update')->middleware('permission:users.update');
+        Route::put('{user}/studio-access', 'studioAccess')->middleware('permission:users.update');
         Route::delete('{user}', 'destroy')->middleware('permission:users.delete');
     });
 

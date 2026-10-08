@@ -20,6 +20,8 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'status' => $this->status,
             'locale' => $this->locale,
+            'studio_access' => $this->studio_approved_at !== null,
+            'studio_approved_at' => $this->studio_approved_at,
             'avatar' => new FileResource($this->whenLoaded('avatar')),
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             // Admin panel useAccess() uchun: ["users.list", "orders.view", ...]
